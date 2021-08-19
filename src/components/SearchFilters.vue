@@ -179,7 +179,8 @@ export default {
       let labelCounts = {species: 0, gender: 0, organ: 0, datasets: 0};
       let filters = [];
       if(event) {
-        // Check for show all in selected cascade options
+        // Event modifiers to have the 'show all' functioning correctly
+        event = this.removeShowAllIfLevelClickedEventModifier(event)
         event = this.showAllEventModfier(event)
         for(let i in event){
           if(event[i] !== undefined){
@@ -222,6 +223,25 @@ export default {
         }
       }
       return event
+    },
+    removeShowAllIfLevelClickedEventModifier: function(event) {
+      console.log(event)
+      let ev = [...event] // So that we don't modify event with the following 'pop'
+      let lastClick = ev.pop()
+      window.lastClick = lastClick
+      if (lastClick[1].split('/')[1].toLowerCase() === 'show all') {
+        return event
+      }
+      let upperLevelOfLastClick = lastClick[0]
+      let modifiedEvent = []
+      for(let i in event){
+        let data = event[i][1].split('/');
+        console.log('level check', data, upperLevelOfLastClick  )
+        if (!(data[0] === upperLevelOfLastClick && data[1].toLowerCase() === 'show all')){
+          modifiedEvent.push(event[i])
+        }
+      }
+      return modifiedEvent
     },
     cascadeExpandChange: function (){
       this.makeCascadeLabelsClickable();
