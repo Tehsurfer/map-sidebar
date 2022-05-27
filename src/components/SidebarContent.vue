@@ -167,6 +167,10 @@ export default {
         })
       }
     },
+    openNeuronSearch: function(keastId){
+      this.resetPageNavigation();
+      this.searchSciCrunch('scicrunch-query-string/', {'field': '*organ.curie', 'curie': keastId})
+    },
     addFilter: function(filter) {
       this.resetPageNavigation();
       if (filter) {
@@ -202,7 +206,7 @@ export default {
         this.dois = searchData.dois
         this.results = searchData.items
         this.loadingCards = false
-        this.searchSciCrunch({'dois': this.dois})
+        this.searchSciCrunch(this.searchEndpoint, {'dois': this.dois})
       })
     },
     filtersLoading: function (val) {
@@ -217,11 +221,11 @@ export default {
       this.page = page
       this.searchAlgolia(this.filters, this.searchInput, this.numberPerPage, this.page)
     },
-    searchSciCrunch: function(params) {
+    searchSciCrunch: function(searchEndpoint=this.searchEndpoint, params) {
       this.loadingScicrunch = true
       this.scrollToTop();
       this.$emit("search-changed", { value: this.searchInput, type: "query-update" });
-      this.callSciCrunch(this.envVars.API_LOCATION, params)
+      this.callSciCrunch(searchEndpoint, params)
         .then(result => {
           //Only process if the search term is the same as the last search term.
           //This avoid old search being displayed.
@@ -254,11 +258,16 @@ export default {
       if (data.results.length === 0) {
         return;
       }
+      if (this.results)
       data.results.forEach(element => {
 
         // match the scicrunch result with algolia result
         let i = this.results.findIndex(res=> res.name === element.name)
 
+        if (i === -1) {
+          this.results.push(element)
+          i = this.results.length -1 
+        }
 
         // Assign scicrunch results to the object
         Object.assign(this.results[i], element)
@@ -304,7 +313,7 @@ export default {
       }
       return p.toString();
     },
-    callSciCrunch: function(apiLocation, params = {}) {
+    callSciCrunch: function(endpoint=this.searchEndpoint, params = {}) {
       return new Promise((resolve, reject) => {
         // the following controller will abort current search
         // if a new one has been started
@@ -312,7 +321,7 @@ export default {
         this._controller = new AbortController();
         let signal = this._controller.signal;
         // Add parameters if we are sent them
-        let fullEndpoint = this.envVars.API_LOCATION + this.searchEndpoint + "?" + this.createfilterParams(params);
+        let fullEndpoint = this.envVars.API_LOCATION + endpoint + "?" + this.createfilterParams(params);
         fetch(fullEndpoint, { signal })
           .then(handleErrors)
           .then(response => response.json())
