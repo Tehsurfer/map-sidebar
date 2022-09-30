@@ -1,8 +1,8 @@
 <template>
   <div class="context-card-container"  ref="container">
     <div v-show="showContextCard">
-      <div v-show="showDetails" class="hide" @click="showDetails = !showDetails">Hide information<i class="el-icon-arrow-up"></i></div>
-      <div v-show="!showDetails" class="hide" @click="showDetails = !showDetails">Show information<i class="el-icon-arrow-down"></i></div>
+      <div v-show="showDetails" class="hide" @click="showDetails = !showDetails">Hide information panel<i class="el-icon-arrow-up"></i></div>
+      <div v-show="!showDetails" class="hide" @click="showDetails = !showDetails">Show information panel<i class="el-icon-arrow-down"></i></div>
       <el-card v-if="showDetails && Object.keys(contextData).length !== 0" v-loading="loading" class="context-card" >
         <div class="card-left">
           <img :src="banner" class="context-image">
