@@ -5,11 +5,11 @@
       <div v-show="!showDetails" class="hide" @click="showDetails = !showDetails">Show information<i class="el-icon-arrow-down"></i></div>
       <el-card v-if="showDetails && Object.keys(contextData).length !== 0" v-loading="loading" class="context-card" >
         <div class="card-left">
-          <img :src="entry.banner" class="context-image">
+          <img :src="banner" class="context-image">
         </div>
         <div class="card-right scrollbar">
           <div class="title">{{contextData.heading}}</div>
-          <div v-html="contextData.description"/>
+          <div v-html="parseMarkdown(contextData.description)"/>
           <br/>
 
           <!-- Show sampeles and views seperately if they do not match -->
@@ -70,6 +70,9 @@ import lang from "element-ui/lib/locale/lang/en";
 import locale from "element-ui/lib/locale";
 import EventBus from "./EventBus"
 import hardcoded_info from './hardcoded-context-info'
+
+import { marked } from 'marked'
+import DOMPurify from 'isomorphic-dompurify';
 
 locale.use(lang);
 Vue.use(Link);
@@ -161,6 +164,17 @@ export default {
       }
       else return false
     },
+    banner: function(){
+      if (this.contextData.banner){
+        console.log('found banner!')
+        return this.getFileFromPath(this.contextData.banner) 
+      } else if (this.contextData && this.contextData.views && this.contextData.views.length > 0) {
+        if(this.contextData.views[0].thumbnail){
+          return this.getFileFromPath(this.contextData.views[0].thumbnail)
+        }
+      } 
+      return this.entry.banner
+    }
   },
   methods: {
     samplesMatching: function(viewId){
@@ -247,6 +261,9 @@ export default {
     generateFileLink(sample){
       return `${this.envVars.ROOT_URL}/file/${sample.discoverId}/${sample.version}?path=${this.processPathForUrl(sample.path)}`
 
+    },
+    parseMarkdown(markdown){
+      return DOMPurify.sanitize(marked.parse(markdown))
     },
     openViewFile: function(view){
       // note that we assume that the view file is in the same directory as the scaffold (viewUrls take relative paths)
