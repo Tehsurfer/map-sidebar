@@ -166,7 +166,6 @@ export default {
     },
     banner: function(){
       if (this.contextData.banner){
-        console.log('found banner!')
         return this.getFileFromPath(this.contextData.banner) 
       } else if (this.contextData && this.contextData.views && this.contextData.views.length > 0) {
         if(this.contextData.views[0].thumbnail){
