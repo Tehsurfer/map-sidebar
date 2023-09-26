@@ -5,7 +5,7 @@ export default {
   //projects to get a handle to various resources
   data() {
     return {
-      defaultImg: require('../../assets/logo-sparc-wave-primary.svg'),
+      defaultImg: '@/../assets/logo-sparc-wave-primary.svg',
     }
   },
   methods: {
