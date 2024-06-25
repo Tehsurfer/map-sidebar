@@ -1,5 +1,5 @@
 function transformKeyValueArrayToObject(data) {
-  return data.values.map(valueArray => 
+  return data.values.map(valueArray =>
     data.keys.reduce((acc, key, index) => {
       acc[key] = valueArray[index];
       return acc;
